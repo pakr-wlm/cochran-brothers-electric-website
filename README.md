@@ -41,3 +41,6 @@ Edit `index.src.html` / `styles.css`, run `python build.py`.
 - Real job photos and a sharper crew photo
 - License number, founding year, named towns served
 - After launch (need a live domain): run seo-page, seo-technical, seo-audit and seo-google; add canonical and og:image
+
+## Google reviews report (google-report.html)
+Standalone outreach page for Kay Cochran: Cochran Brothers (5.0, 7 Google reviews) vs Argo Total Electrical (4.9, 208), why reviews drive local ranking, a job-value calculator and a 90-day plan. Not linked from the homepage and marked noindex. Numbers live in the `DATA` block at the bottom of the file.

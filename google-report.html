@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Who Gets the Call in Gainesville</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --paper: #f5f6f3;
+    --panel: #ffffff;
+    --ink: #1c2530;
+    --ink-soft: #4a5663;
+    --line: #d9ddd8;
+    --copper: #a94e17;
+    --copper-soft: #f3e3d6;
+    --star: #d99a0b;
+    --good: #2f7a4b;
+    --warn: #b23b2a;
+    --bar-bg: #e8ebe7;
+    --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #13181e;
+      --panel: #1b222a;
+      --ink: #e9ece8;
+      --ink-soft: #a8b2bb;
+      --line: #2e3842;
+      --copper: #e08a4f;
+      --copper-soft: #3a2619;
+      --star: #f0b62e;
+      --good: #6cc38c;
+      --warn: #f07a66;
+      --bar-bg: #26303a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #13181e;
+    --panel: #1b222a;
+    --ink: #e9ece8;
+    --ink-soft: #a8b2bb;
+    --line: #2e3842;
+    --copper: #e08a4f;
+    --copper-soft: #3a2619;
+    --star: #f0b62e;
+    --good: #6cc38c;
+    --warn: #f07a66;
+    --bar-bg: #26303a;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    padding-inline: 20px;
+    padding-block: 40px 64px;
+  }
+  .sheet { max-width: 760px; margin: 0 auto; display: grid; gap: 56px; }
+
+  h1, h2 { font-family: var(--display); font-weight: 700; line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: 0.005em; }
+  h1 { font-size: clamp(40px, 7vw, 64px); }
+  h2 { font-size: clamp(28px, 4.4vw, 38px); }
+  p { margin: 0; max-width: 65ch; }
+  .label {
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--copper);
+  }
+  .muted { color: var(--ink-soft); }
+  section { display: grid; gap: 18px; }
+
+  /* Header as a job ticket */
+  .ticket {
+    display: grid; gap: 22px;
+    border-top: 6px solid var(--copper);
+    padding-top: 22px;
+  }
+  .ticket-meta {
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    font-family: var(--mono); font-size: 13px; color: var(--ink-soft);
+  }
+  .ticket-meta b { color: var(--ink); font-weight: 600; }
+  .lead { font-size: 20px; line-height: 1.5; }
+
+  /* Search result mockup */
+  .results {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 6px 0; overflow: hidden;
+  }
+  .query {
+    display: flex; align-items: center; gap: 10px;
+    margin: 10px 18px 6px; padding: 10px 16px;
+    border: 1px solid var(--line); border-radius: 999px;
+    font-size: 15px; color: var(--ink-soft);
+  }
+  .query svg { flex: none; }
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center;
+    padding: 16px 20px; border-top: 1px solid var(--line);
+  }
+  .row:first-of-type { border-top: 0; }
+  .row .name { font-weight: 700; font-size: 18px; }
+  .row .meta { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--ink-soft); flex-wrap: wrap; }
+  .row .meta .num { font-family: var(--mono); color: var(--ink); font-weight: 600; }
+  .row .tag {
+    grid-row: span 2; font-family: var(--mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap;
+  }
+  .row.them .tag { background: var(--bar-bg); color: var(--ink-soft); }
+  .row.you { background: var(--copper-soft); }
+  .row.you .tag { background: var(--copper); color: var(--panel); }
+  .stars { display: inline-flex; gap: 1px; }
+  .stars svg { width: 15px; height: 15px; }
+  .caption { font-size: 14px; color: var(--ink-soft); }
+
+  /* Scorecard */
+  .score { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .score > div {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px; display: grid; gap: 6px; align-content: start;
+  }
+  .score .verdict { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .score .verdict.win { color: var(--good); }
+  .score .verdict.lose { color: var(--warn); }
+  .score .big { font-family: var(--display); font-size: 44px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .score .big small { font-size: 24px; color: var(--ink-soft); font-weight: 600; }
+
+  .bars { display: grid; gap: 12px; }
+  .bar { display: grid; grid-template-columns: 150px 1fr 56px; gap: 12px; align-items: center; font-size: 15px; }
+  .bar .track { height: 18px; background: var(--bar-bg); border-radius: 4px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--ink-soft); border-radius: 4px; }
+  .bar.you .fill { background: var(--copper); min-width: 4px; }
+  .bar .n { font-family: var(--mono); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Google quote */
+  blockquote {
+    margin: 0; padding: 20px 22px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px;
+    display: grid; gap: 10px;
+  }
+  blockquote p { font-size: 19px; font-style: italic; }
+  blockquote cite { font-style: normal; font-size: 14px; color: var(--ink-soft); }
+  .factors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .factors div { display: grid; gap: 4px; align-content: start; border-top: 2px solid var(--line); padding-top: 12px; }
+  .factors div.key { border-top-color: var(--copper); }
+  .factors h3 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; }
+  .factors p { font-size: 15px; color: var(--ink-soft); }
+
+  /* Calculator */
+  .calc {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 22px; display: grid; gap: 20px;
+  }
+  .inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 14px; font-weight: 600; }
+  .field .wrap { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+  .field .wrap span { padding-inline: 10px; font-family: var(--mono); color: var(--ink-soft); }
+  .field input {
+    width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink);
+    font-family: var(--mono); font-size: 18px; font-weight: 600; padding: 10px 10px 10px 0;
+  }
+  .field .wrap:focus-within { outline: 2px solid var(--copper); outline-offset: 1px; }
+  .field input:focus { outline: none; }
+  .result { display: flex; flex-wrap: wrap; gap: 12px 40px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 18px; }
+  .result div { display: grid; gap: 2px; }
+  .result .big { font-family: var(--display); font-size: 48px; font-weight: 700; line-height: 1; color: var(--copper); font-variant-numeric: tabular-nums; }
+
+  /* Plan */
+  ol.plan { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; }
+  ol.plan li {
+    counter-increment: step; display: grid; grid-template-columns: 110px 1fr; gap: 16px;
+    padding: 18px 0; border-top: 1px solid var(--line);
+  }
+  ol.plan li:last-child { border-bottom: 1px solid var(--line); }
+  ol.plan .when { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--copper); padding-top: 3px; }
+  ol.plan h3 { margin: 0 0 4px; font-size: 18px; }
+  ol.plan p { font-size: 16px; color: var(--ink-soft); }
+  .goal {
+    display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
+    background: var(--copper-soft); border-radius: 10px; padding: 18px 20px;
+  }
+  .goal .big { font-family: var(--display); font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .cta { border-top: 6px solid var(--copper); padding-top: 22px; display: grid; gap: 12px; }
+  .sign { font-family: var(--mono); font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 620px) {
+    body { font-size: 16px; padding-block: 28px 48px; }
+    .sheet { gap: 44px; }
+    .score, .inputs, .factors { grid-template-columns: 1fr; }
+    .bar { grid-template-columns: 1fr 48px; }
+    .bar .who { grid-column: 1 / -1; }
+    ol.plan li { grid-template-columns: 1fr; gap: 4px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bar .fill { transition: width 600ms ease-out; }
+  }
+</style>
+
+</head>
+<body>
+<main class="sheet">
+
+  <header class="ticket">
+    <div class="ticket-meta">
+      <span>Prepared for <b id="t-contact"></b></span>
+      <span><b id="t-business"></b></span>
+      <span id="t-city"></span>
+      <span id="t-date"></span>
+    </div>
+    <h1 id="t-headline"></h1>
+    <p class="lead" id="t-lead"></p>
+  </header>
+
+  <section>
+    <span class="label">What a customer sees</span>
+    <h2>Two electricians, side by side</h2>
+    <div class="results" aria-label="Simplified Google local results">
+      <div class="query">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span id="t-query"></span>
+      </div>
+      <div class="row them">
+        <div class="name" id="r-comp-name"></div>
+        <span class="tag">More proof</span>
+        <div class="meta"><span class="num" id="r-comp-rating"></span><span class="stars" id="r-comp-stars"></span><span id="r-comp-count"></span></div>
+      </div>
+      <div class="row you">
+        <div class="name" id="r-you-name"></div>
+        <span class="tag">You</span>
+        <div class="meta"><span class="num" id="r-you-rating"></span><span class="stars" id="r-you-stars"></span><span id="r-you-count"></span></div>
+      </div>
+    </div>
+    <p class="caption" id="t-caption"></p>
+  </section>
+
+  <section>
+    <span class="label">The scorecard</span>
+    <h2 id="t-score-head"></h2>
+    <div class="score">
+      <div>
+        <span class="verdict win">You win</span>
+        <span class="big" id="s-rating"></span>
+        <p class="muted">Star rating. Your customers love the work.</p>
+      </div>
+      <div>
+        <span class="verdict lose">You lose</span>
+        <span class="big" id="s-count"></span>
+        <p class="muted" id="s-count-note"></p>
+      </div>
+    </div>
+    <div class="bars" aria-label="Google review count comparison, drawn to scale">
+      <div class="bar"><span class="who" id="b-comp-name"></span><div class="track"><div class="fill" id="b-comp"></div></div><span class="n" id="b-comp-n"></span></div>
+      <div class="bar you"><span class="who" id="b-you-name"></span><div class="track"><div class="fill" id="b-you"></div></div><span class="n" id="b-you-n"></span></div>
+    </div>
+    <p id="t-score-body"></p>
+  </section>
+
+  <section>
+    <span class="label">Why they show up first</span>
+    <h2>Google ranks local businesses on three things</h2>
+    <div class="factors">
+      <div><h3>Relevance</h3><p>Does your profile match what they searched? Your services and categories decide this.</p></div>
+      <div><h3>Distance</h3><p>How close you are to the person searching. Nobody can change this.</p></div>
+      <div class="key"><h3>Prominence</h3><p>How well known and trusted you look. Reviews are the biggest lever you control.</p></div>
+    </div>
+    <blockquote>
+      <p>"Google review count and review score factor into local search ranking. More reviews and positive ratings can help your business's local ranking."</p>
+      <cite>Google Business Profile Help, "Tips to improve your local ranking on Google"</cite>
+    </blockquote>
+    <p>Reviews do two jobs at once. They help Google decide to show you, and they help the customer decide to call you once they see you.</p>
+  </section>
+
+  <section>
+    <span class="label">What it's worth to you</span>
+    <h2>Run the numbers with your own figures</h2>
+    <p class="muted">These start with example numbers. Change them to match your business and the total updates.</p>
+    <div class="calc">
+      <div class="inputs">
+        <div class="field">
+          <label for="c-job">Average job value</label>
+          <div class="wrap"><span>$</span><input id="c-job" type="number" min="0" step="50" inputmode="numeric"></div>
+        </div>
+        <div class="field">
+          <label for="c-calls">Extra calls per month</label>
+          <div class="wrap"><span>#</span><input id="c-calls" type="number" min="0" step="1" inputmode="numeric"></div>
+        </div>
+        <div class="field">
+          <label for="c-close">Calls that become jobs</label>
+          <div class="wrap"><span>%</span><input id="c-close" type="number" min="0" max="100" step="5" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="result" aria-live="polite">
+        <div><span class="label">Per month</span><span class="big" id="c-month"></span></div>
+        <div><span class="label">Per year</span><span class="big" id="c-year"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="label">The plan</span>
+    <h2>How we close the gap in 90 days</h2>
+    <ol class="plan">
+      <li><span class="when">Week 1</span><div><h3>Tune up your Google profile</h3><p>Services, service area, hours, categories and real photos of your crew and trucks, so you match more searches.</p></div></li>
+      <li><span class="when">Week 1 to 2</span><div><h3>Turn on automatic review requests</h3><p>Every finished job gets a short text with a direct link to leave a review. Nobody on your team has to remember to ask.</p></div></li>
+      <li><span class="when">Every week</span><div><h3>Reply to every review</h3><p>Good or bad, each one gets a reply. Google counts engagement, and future customers read how you respond.</p></div></li>
+      <li><span class="when">Day 90</span><div><h3>Side-by-side re-check</h3><p>We pull the same comparison again so you can see exactly what changed.</p></div></li>
+    </ol>
+    <div class="goal">
+      <span class="label">90-day target</span>
+      <span class="big" id="g-target"></span>
+      <span class="muted">A target to work toward, based on how many jobs you finish. Not a guarantee.</span>
+    </div>
+  </section>
+
+  <footer class="cta">
+    <h2 id="t-cta"></h2>
+    <p>Reply to the email this came with and I'll walk you through the setup. It takes about 15 minutes of your time. I handle the rest.</p>
+    <p class="sign">Patrik Kraus · Wired Local Marketing</p>
+  </footer>
+</main>
+
+<script>
+  // Swap these values to reuse the report for another prospect.
+  const DATA = {
+    contact: "Kay Cochran",
+    business: "Cochran Brothers Electric Co., Inc.",
+    shortName: "Cochran Brothers",
+    city: "Gainesville, GA",
+    since: 1980,
+    date: "September 2026",
+    query: "electrician near Gainesville, GA",
+    you: { rating: 5.0, reviews: 7 },
+    competitor: { name: "Argo Total Electrical", rating: 4.9, reviews: 208 },
+    targetReviews: 40,
+    calc: { job: 450, calls: 4, close: 50 }
+  };
+
+  const $ = id => document.getElementById(id);
+  const years = parseInt(DATA.date.slice(-4), 10) - DATA.since;
+  const ratio = Math.round(DATA.competitor.reviews / Math.max(DATA.you.reviews, 1));
+
+  function starSvg(fill) {
+    const id = "g" + Math.random().toString(36).slice(2, 8);
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="${id}"><stop offset="${fill * 100}%" stop-color="var(--star)"/><stop offset="${fill * 100}%" stop-color="var(--bar-bg)"/></linearGradient></defs><path fill="url(#${id})" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>`;
+  }
+  function stars(rating) {
+    let out = "";
+    for (let i = 0; i < 5; i++) out += starSvg(Math.max(0, Math.min(1, rating - i)));
+    return out;
+  }
+
+  $("t-contact").textContent = DATA.contact;
+  $("t-business").textContent = DATA.business;
+  $("t-city").textContent = DATA.city;
+  $("t-date").textContent = DATA.date;
+  $("t-headline").textContent = `When ${DATA.city.split(",")[0]} searches for an electrician, who gets the call?`;
+  $("t-lead").textContent = `${DATA.shortName} has been doing this for ${years} years and has a perfect ${DATA.you.rating.toFixed(1)} on Google. But a customer comparing electricians sees ${DATA.you.reviews} reviews next to ${DATA.competitor.reviews}, and most of them call the business with more proof.`;
+
+  $("t-query").textContent = DATA.query;
+  $("r-comp-name").textContent = DATA.competitor.name;
+  $("r-comp-rating").textContent = DATA.competitor.rating.toFixed(1);
+  $("r-comp-stars").innerHTML = stars(DATA.competitor.rating);
+  $("r-comp-count").textContent = `(${DATA.competitor.reviews} reviews)`;
+  $("r-you-name").textContent = DATA.business;
+  $("r-you-rating").textContent = DATA.you.rating.toFixed(1);
+  $("r-you-stars").innerHTML = stars(DATA.you.rating);
+  $("r-you-count").textContent = `(${DATA.you.reviews} reviews)`;
+  $("t-caption").textContent = `Simplified view based on public Google ratings, ${DATA.date}. The order Google shows changes with where the customer is searching from.`;
+
+  $("t-score-head").textContent = "Better work, less proof";
+  $("s-rating").innerHTML = `${DATA.you.rating.toFixed(1)} <small>vs ${DATA.competitor.rating.toFixed(1)}</small>`;
+  $("s-count").innerHTML = `${DATA.you.reviews} <small>vs ${DATA.competitor.reviews}</small>`;
+  $("s-count-note").textContent = `Review count. ${DATA.competitor.name} has about ${ratio} times as many.`;
+  $("b-comp-name").textContent = DATA.competitor.name;
+  $("b-you-name").textContent = DATA.shortName;
+  $("b-comp-n").textContent = DATA.competitor.reviews;
+  $("b-you-n").textContent = DATA.you.reviews;
+  const max = Math.max(DATA.competitor.reviews, DATA.you.reviews);
+  $("b-comp").style.width = (DATA.competitor.reviews / max * 100) + "%";
+  $("b-you").style.width = (DATA.you.reviews / max * 100) + "%";
+  $("t-score-body").textContent = `A perfect score on ${DATA.you.reviews} reviews reads like a new company. ${DATA.competitor.reviews} reviews reads like the safe choice. After ${years} years you have no shortage of happy customers. They were just never asked to say so on Google.`;
+
+  $("g-target").textContent = `${DATA.you.reviews} → ${DATA.targetReviews}+ reviews`;
+  $("t-cta").textContent = `Want this set up for ${DATA.shortName}?`;
+
+  const money = n => "$" + Math.round(n).toLocaleString("en-US");
+  const inputs = { job: $("c-job"), calls: $("c-calls"), close: $("c-close") };
+  inputs.job.value = DATA.calc.job;
+  inputs.calls.value = DATA.calc.calls;
+  inputs.close.value = DATA.calc.close;
+  function recalc() {
+    const job = Math.max(0, parseFloat(inputs.job.value) || 0);
+    const calls = Math.max(0, parseFloat(inputs.calls.value) || 0);
+    const close = Math.min(100, Math.max(0, parseFloat(inputs.close.value) || 0)) / 100;
+    const month = job * calls * close;
+    $("c-month").textContent = money(month);
+    $("c-year").textContent = money(month * 12);
+  }
+  Object.values(inputs).forEach(el => el.addEventListener("input", recalc));
+  recalc();
+</script>
+</body>
+</html>
